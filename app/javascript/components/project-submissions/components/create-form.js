@@ -1,8 +1,22 @@
 import React from 'react';
-import { useForm } from "react-hook-form";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers';
+import * as yup from "yup";
+
 
 const CreateForm = (props) => {
-  const { register, errors, handleSubmit, formState, reset } = useForm();
+  const schema = yup.object().shape({
+    repo_url: yup.string().url("Must be a URL"),
+    live_preview_url: yup.string().url("Must be a URL"),
+  });
+
+  const { register, handleSubmit, formState, errors, reset, watch } = useForm({
+    mode: 'onChange',
+    resolver: yupResolver(schema),
+  });
+
+  console.log("just checking changes are being registered")
+  console.log("errors", errors)
 
   const handleClose = () => {
     reset({
@@ -30,17 +44,10 @@ const CreateForm = (props) => {
           <span className="form__icon fab fa-github"></span>
           <input
             className="form__element form__element--with-icon"
-            type="text"
+            type="url"
             name="repo_url"
             placeholder="Repository URL"
-            ref={register({
-              required: 'Required',
-              pattern: {
-                value: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/,
-                message: "Must be a URL"
-              }
-
-            })}
+            ref={register}
           />
         </div>
         {errors.repo_url && <div className="form__error-message push-down"> {errors.repo_url.message}</div> }
@@ -52,13 +59,7 @@ const CreateForm = (props) => {
             type="text"
             placeholder="Live Preview URL"
             name="live_preview_url"
-            ref={register({
-              required: "Required",
-              pattern: {
-                value: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/,
-                message: "Must be a URL"
-              }
-            })}
+            ref={register}
           />
         </div>
         {errors.live_preview_url && <div className="form__error-message push-down"> {errors.live_preview_url.message}</div> }
